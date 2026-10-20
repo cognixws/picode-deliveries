@@ -1,0 +1,45 @@
+{
+  "id": "deliveries",
+  "name": "Deliveries",
+  "version": "0.1.0",
+  "apiVersion": 10,
+  "publisher": "COGNIX[SE]",
+  "description": "The land queue of a PiCode checkout in the bottom dock: who waits, in what order, and the recent verdicts. Move a delivery earlier or later, or stop one that is still waiting.",
+  "icon": "icons/deliveries.svg",
+  "activation": {
+    "instance": true
+  },
+  "settings": [
+    {
+      "key": "checkout",
+      "label": "PiCode checkout",
+      "type": "text",
+      "default": "",
+      "description": "The folder of the PiCode repository whose deliveries this page shows, for example /home/you/picode. Its scripts/land-queue.mjs makes every change."
+    }
+  ],
+  "process": {
+    "command": "node",
+    "args": [
+      "${extensionDir}/server.mjs"
+    ]
+  },
+  "ui": {
+    "pages": [
+      {
+        "id": "queue",
+        "title": "Deliveries",
+        "path": "ui/index.html"
+      }
+    ]
+  },
+  "contributes": {
+    "dockPanels": [
+      {
+        "id": "queue",
+        "title": "Deliveries",
+        "page": "queue"
+      }
+    ]
+  }
+}

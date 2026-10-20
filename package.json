@@ -1,0 +1,15 @@
+{
+  "name": "picode-deliveries",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "lint": "node scripts/lint.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "npm run lint && npm test"
+  }
+}
