@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 — 2026-10-23
+
+- Copy names the product: the description, the setting (now **Source folder**) and its messages say COGNIX[WS] instead of the code name PiCode. The saved folder is kept.
+
 ## 0.1.0 — 2026-10-20
 
 - The land queue of a PiCode checkout in the bottom dock and as an Apps tile: order, branch, age, pid and state per delivery, the red-main banner and recent verdicts.

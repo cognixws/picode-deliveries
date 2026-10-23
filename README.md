@@ -1,6 +1,6 @@
 # Deliveries
 
-A COGNIX[WS] extension that shows the land queue of a PiCode checkout in
+A COGNIX[WS] extension that shows the land queue of your COGNIX[WS] source folder in
 the bottom dock (door G, `contributes.dockPanels`, apiVersion 10): who
 waits, in what order, and the recent verdicts. The same page is an Apps
 tile, which is the phone face (the dock stays closed below 768px).
@@ -33,7 +33,7 @@ does not (D1). No Host API permission.
 ## Setup
 
 Install from this folder (Extensions ▸ Install, or a git URL once
-published). Turn it on for the instance, then set **PiCode checkout** in
+published). Turn it on for the instance, then set **Source folder** in
 its settings to the repository root (for example `/home/you/picode`). The
 queue is `/tmp/picode-land.lock.queue` unless the daemon's environment
 sets `LAND_LOCK`, as for `land.mjs`.
@@ -48,7 +48,7 @@ sets `LAND_LOCK`, as for `land.mjs`.
 | Unreadable folder, every ticket bad, `flock` missing | The queue could not be read. | Retry |
 | One bad ticket | Skipped | None |
 | Process stopped or extension off | The host's line | Retry |
-| Checkout not set | Choose the PiCode checkout this page follows. | Open settings |
+| Checkout not set | Choose the COGNIX[WS] source folder this page follows. | Open settings |
 
 A Stop or move shows a busy row ("Stopping…", "Moving…") until the ticket
 file agrees: a move until the ticket carries the priority `land-queue.mjs`
