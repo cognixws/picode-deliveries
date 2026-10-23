@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { LINES, ageLabel, folderHealth, isLandCmdline, moveTarget, publishedReceipts, recentVerdicts, redBanner, rows, ticketPid, verifyWaiter } from "../lib/queue.mjs";
+import { LINES, ageLabel, folderHealth, gateVerdicts, isLandCmdline, landStages, moveTarget, publishedReceipts, recentVerdicts, redBanner, rows, runningGates, ticketPid, verifyWaiter } from "../lib/queue.mjs";
 
 const T = (ms, pid) => `${String(ms).padStart(15, "0")}-${pid}.json`;
 const ticket = (o) => ({ ticket: T(o.ms ?? 1, o.pid ?? 100), branch: "feat/x", pid: o.pid ?? 100, state: "ready", prio: 0, claim: null, ageSeconds: 30, ...o });
@@ -152,4 +152,49 @@ test("published receipts: lands and CI runs no land owns", () => {
     { id: "C3", operation: "P1", kind: "ci" },
   ]);
   assert.deepEqual(out.map((r) => r.id), ["L1", "C2"]);
+});
+
+// ---- gates and land stages ----------------------------------------------
+
+const at = (s) => new Date(Date.UTC(2026, 9, 23, 12, 0, s)).toISOString();
+const receipt = (o) => ({ schemaVersion: 1, id: o.id || "r", kind: "scoped", sourceRef: "feat/x", outcome: "started", startedAt: at(0), ...o });
+
+test("running now: live started gates, oldest first, with their step and phase", () => {
+  const alive = (pid) => pid !== 9;
+  const out = runningGates([
+    receipt({ id: "a", pid: 1, phase: "running", via: "close", startedAt: at(10) }),
+    receipt({ id: "b", pid: 2, phase: "waiting", kind: "full-ci", startedAt: at(5) }),
+    receipt({ id: "dead", pid: 9 }),
+    receipt({ id: "nopid" }),
+    receipt({ id: "land", kind: "land", pid: 3 }),
+    receipt({ id: "done", pid: 4, outcome: "passed", finishedAt: at(20) }),
+  ], { alive, now: Date.parse(at(0)) + 600_000 });
+  assert.deepEqual(out.map((g) => [g.id, g.label, g.phase, g.line]), [
+    ["b", "make ci", "waiting", "Waiting for a CI slot"],
+    ["a", "make close", "running", "Running checks"],
+  ]);
+  assert.equal(out[1].branch, "feat/x");
+  assert.equal(out[1].age, "10 min");
+});
+
+test("a live land's stage reaches its queue row", () => {
+  const stages = landStages([receipt({ kind: "land", pid: 77, stage: "verify" }), receipt({ kind: "land", pid: 78, stage: "close" })], (pid) => pid === 77);
+  const [row] = rows([{ ticket: "000000000000001-77.json", branch: "feat/x", pid: 77, state: "landing", ageSeconds: 30 }], stages);
+  assert.equal(row.reason, "Merging onto main and running make ci · Holding main. Wait for the verdict.");
+  const [other] = rows([{ ticket: "000000000000002-78.json", branch: "feat/y", pid: 78, state: "ready", ageSeconds: 30 }], stages);
+  assert.equal(other.reason, "");
+});
+
+test("finished worktree gates become verdicts; main and land gates do not", () => {
+  const out = gateVerdicts([
+    receipt({ id: "p", outcome: "passed", via: "close", startedAt: at(0), finishedAt: at(125) }),
+    receipt({ id: "f", outcome: "failed", kind: "full-ci", startedAt: at(0), finishedAt: at(30) }),
+    receipt({ id: "m", outcome: "passed", sourceRef: "main", finishedAt: at(9) }),
+    receipt({ id: "l", outcome: "passed", via: "land", finishedAt: at(9) }),
+    receipt({ id: "s", outcome: "started" }),
+  ]);
+  assert.deepEqual(out.map((v) => [v.eventId, v.state, v.summary]), [
+    ["gate:p", "succeeded", "make close passed: feat/x · 2 min 05 s"],
+    ["gate:f", "failed", "make ci failed: feat/x · 30 s"],
+  ]);
 });

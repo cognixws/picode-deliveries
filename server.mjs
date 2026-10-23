@@ -70,7 +70,7 @@ const server = http.createServer(async (req, res) => {
   try {
     const { d, problem } = await deliveries();
     if (req.method === "GET" && path === "/queue") {
-      if (problem) return send(200, { state: "unconfigured", line: problem, banner: "", rows: [], verdicts: [] });
+      if (problem) return send(200, { state: "unconfigured", line: problem, banner: "", running: [], rows: [], verdicts: [] });
       return send(200, await d.snapshot());
     }
     if (req.method === "POST" && (path === "/move" || path === "/stop")) {

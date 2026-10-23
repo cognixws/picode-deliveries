@@ -1,5 +1,5 @@
-// The Deliveries page: the land queue, its red-main banner and recent
-// verdicts. Everything it shows comes from the process (GET /queue); every
+// The Deliveries page: the gates running now, the land queue (each land on
+// its step), its red-main banner and recent verdicts. Everything it shows comes from the process (GET /queue); every
 // change is a process call that runs the checkout's land-queue.mjs. A row,
 // its ⋯ button, a right-click and Shift+F10 / the ContextMenu key open the
 // same actions (ADR-0289, spec §3.4).
@@ -89,6 +89,19 @@
       </li>`;
   }
 
+  // What runs now: make close, make ci-scoped and make ci in any worktree,
+  // waiting for a CI slot or running. Nothing to show draws nothing.
+  function runningHtml() {
+    const list = snap?.running || [];
+    if (!list.length || snap.state === "unconfigured") return "";
+    return `<section class="running" aria-labelledby="running-h"><h2 id="running-h">Running now</h2>
+      <ul class="vlist">${list.map((g) => `<li class="gate is-${esc(g.phase)}" tabindex="0" aria-label="${esc(g.label)}, ${esc(g.branch)}: ${esc(g.line)}, ${esc(g.age)}">
+        <span class="chip g-${esc(g.phase)}">${g.phase === "waiting" ? "waiting" : "running"}</span>
+        <span class="main"><span class="summary">${esc(g.label)}${g.branch ? ` · <span class="mono">${esc(g.branch)}</span>` : ""}</span><span class="reason">${esc(g.line)}</span></span>
+        <span class="meta age">${esc(g.age)}</span>
+      </li>`).join("")}</ul></section>`;
+  }
+
   function queueHtml() {
     if (error && /is off|not running/i.test(error)) return `<div class="notice" role="status"><span>Deliveries is turned off. Turn it on to read the queue.</span><button type="button" data-act="settings">Open Extensions</button></div>`;
     if (error) return `<div class="notice error" role="alert"><span>${esc(error)}</span><button type="button" data-act="retry">Retry</button></div>`;
@@ -119,7 +132,8 @@
     root.innerHTML = `${inDock() ? "" : `<h1 class="title">Deliveries</h1>`}
       ${snap?.banner ? `<div class="notice warn" role="status"><span>${esc(snap.banner)}</span></div>` : ""}
       ${note ? `<div class="notice error" role="alert"><span>${esc(note)}</span><button type="button" data-act="dismiss">Dismiss</button></div>` : ""}
-      <section class="queue" aria-label="Queue">${queueHtml()}</section>
+      ${runningHtml()}
+      <section class="queue" aria-labelledby="queue-h"><h2 id="queue-h">Land queue</h2>${queueHtml()}</section>
       ${verdictsHtml()}`;
     if (focus) {
       const host = root.querySelector(focus.sel);

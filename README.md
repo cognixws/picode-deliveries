@@ -12,8 +12,8 @@ repository (slice F2, decisions D1–D8).
 
 | Part | Does | Does not |
 |---|---|---|
-| Page (`ui/`) | One row per live ticket in queue order: order, branch, relative age, pid, state (`preparing`, `ready`, `landing`, `claimed`, or the raw state). Red-main banner. Recent verdicts with Copy summary / Copy event id | Navigate the host, open the Inbox, drag |
-| Process (`server.mjs`, `lib/`) | Reads the queue folder, `var/land-red`, `var/job-events` and `var/completion-receipts` of the checkout. Moves and stops through the checkout's `scripts/land-queue.mjs` | Rename, write or delete a ticket or sidecar, send a signal itself, run git, deploy, write `var/land-red`, read PiCode's session |
+| Page (`ui/`) | Running now: the gates in progress in any worktree. One row per live ticket in queue order: order, branch, relative age, pid, state (`preparing`, `ready`, `landing`, `claimed`, or the raw state). Red-main banner. Recent verdicts with Copy summary / Copy event id | Navigate the host, open the Inbox, drag |
+| Process (`server.mjs`, `lib/`) | Reads the queue folder, `var/land-red`, `var/job-events` and `var/completion-receipts` of the checkout, and its delivery receipts (`.git/picode-delivery`, ADR-0170) for what runs now and each land's step. Moves and stops through the checkout's `scripts/land-queue.mjs` | Rename, write or delete a ticket or sidecar, send a signal itself, run git, deploy, write `var/land-red`, read PiCode's session |
 
 Every change is one call to `scripts/land-queue.mjs` (`move` or `drop`):
 one mutator, never copied. Before `drop`, the process checks that the
