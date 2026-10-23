@@ -1,7 +1,7 @@
 {
   "id": "deliveries",
   "name": "Deliveries",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "apiVersion": 10,
   "publisher": "COGNIX[SE]",
   "description": "The land queue of your COGNIX[WS] source folder in the bottom dock: who waits, in what order, and the recent verdicts. Move a delivery earlier or later, or stop one that is still waiting.",

@@ -168,6 +168,9 @@ test("running now: live started gates, oldest first, with their step and phase",
     receipt({ id: "nopid" }),
     receipt({ id: "land", kind: "land", pid: 3 }),
     receipt({ id: "done", pid: 4, outcome: "passed", finishedAt: at(20) }),
+    receipt({ id: "landci", pid: 5, kind: "full-ci", via: "land", sourceRef: "" }),
+    receipt({ id: "batch", pid: 6, kind: "full-ci", sourceRef: "", worktree: "/r/var/land-batch" }),
+    receipt({ id: "main", pid: 7, sourceRef: "main" }),
   ], { alive, now: Date.parse(at(0)) + 600_000 });
   assert.deepEqual(out.map((g) => [g.id, g.label, g.phase, g.line]), [
     ["b", "make ci", "waiting", "Waiting for a CI slot"],
@@ -192,6 +195,7 @@ test("finished worktree gates become verdicts; main and land gates do not", () =
     receipt({ id: "m", outcome: "passed", sourceRef: "main", finishedAt: at(9) }),
     receipt({ id: "l", outcome: "passed", via: "land", finishedAt: at(9) }),
     receipt({ id: "s", outcome: "started" }),
+    receipt({ id: "b", outcome: "passed", kind: "full-ci", sourceRef: "", worktree: "/r/var/land-batch", finishedAt: at(9) }),
   ]);
   assert.deepEqual(out.map((v) => [v.eventId, v.state, v.summary]), [
     ["gate:p", "succeeded", "make close passed: feat/x · 2 min 05 s"],

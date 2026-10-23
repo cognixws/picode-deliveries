@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 — 2026-10-23
+
+- A land's own `make ci` no longer shows under Running now (its queue row already says the step), and a gate in a land's batch tree no longer becomes a verdict of its own.
+
 ## 0.2.0 — 2026-10-23
 
 - **Running now**: `make close`, `make ci-scoped` and `make ci` in any worktree, waiting for a CI slot or running, with their branch and age. Read from the checkout's delivery receipts (ADR-0170, amended 2026-10-23); a run whose process is gone is not shown.
